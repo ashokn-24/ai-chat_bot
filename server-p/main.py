@@ -6,8 +6,6 @@ import google.generativeai as genai
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import dotenv_values
-from bson import ObjectId
-from fastapi import HTTPException
 
 
 app = FastAPI()
