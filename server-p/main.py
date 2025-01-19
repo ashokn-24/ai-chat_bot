@@ -7,6 +7,7 @@ from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import dotenv_values
 
+
 app = FastAPI()
 
 config = dotenv_values(".env")
