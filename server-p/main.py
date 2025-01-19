@@ -6,6 +6,8 @@ import google.generativeai as genai
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import dotenv_values
+from bson import ObjectId
+from fastapi import HTTPException
 
 
 app = FastAPI()
@@ -79,14 +81,12 @@ def reply_user_req(chat_request: ChatRequest):
     instructions = "Answer in 1 or 2 lines, and be concise. "
     full_prompt = instructions + user_message
 
-    # Send request to Google Gemini AI
     try:
         response = model.generate_content(full_prompt)
         bot_reply = response.text if hasattr(response, "text") else "AI response is empty"
     except Exception as e:
         bot_reply = f"Error: {str(e)}"
     
-    # Store the chat in MongoDB
     chat_collection = app.state.chat_collection
     existing_conversation = chat_collection.find_one({"user_message": user_message})
 
@@ -117,16 +117,13 @@ def get_chat_history():
     for chat in chats:
         for message in chat["messages"]:
             response.append({
-                "id": str(chat["_id"]),  # Convert ObjectId to string
+                "id": str(chat["_id"]), 
                 "user_message": message["user_message"],
                 "bot_reply": message["bot_reply"]
             })
     
     return response
 
-
-from bson import ObjectId
-from fastapi import HTTPException
 
 @app.get("/chat/{message_id}", response_model=Message)
 def get_message_by_id(message_id: str):
@@ -140,8 +137,7 @@ def get_message_by_id(message_id: str):
         if not chat:
             raise HTTPException(status_code=404, detail="Message not found")
 
-        # Extract the latest message from the conversation
-        latest_message = chat["messages"][-1]  # Last message in the list
+        latest_message = chat["messages"][-1] 
 
         return {
             "id": str(chat["_id"]),
